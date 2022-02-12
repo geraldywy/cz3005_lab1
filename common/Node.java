@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Node {
   public String id;
-  public Map<Node, Double> neighbours;
+  public Map<Node, EdgeCosts> neighbours;
 
   // assumes the largest cost fits in a 64 bit integer and there are no floating
   // weights, only integers.

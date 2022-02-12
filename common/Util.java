@@ -15,7 +15,9 @@ public class Util {
   public static Map<String, Node> buildGraph() {
     JSONObject graphJson = readJsonFile("G.json");
 
-    Map<String, Map<String, Double>> edgeWeightMap = buildWeightMap("Dist.json");
+    Map<String, Map<String, Double>> distWeightMap = buildWeightMap("Dist.json");
+    Map<String, Map<String, Double>> energyWeightMap = buildWeightMap("Cost.json");
+
     Map<String, Node> nodesMap = new HashMap<>();
 
     for (Object keyObj : graphJson.keySet()) {
@@ -26,14 +28,15 @@ public class Util {
       }
 
       Node cur = nodesMap.get(key);
-      Map<Node, Double> neighboursNodes = new HashMap<>();
+      Map<Node, EdgeCosts> neighboursNodes = new HashMap<>();
       for (Object neighbour : neighbours) {
         String neighbourKey = neighbour.toString();
         if (!nodesMap.containsKey(neighbourKey)) {
           nodesMap.put(neighbourKey, new Node(neighbourKey));
         }
 
-        neighboursNodes.put(nodesMap.get(neighbourKey), edgeWeightMap.get(key).get(neighbourKey));
+        neighboursNodes.put(nodesMap.get(neighbourKey),
+            new EdgeCosts(distWeightMap.get(key).get(neighbourKey), energyWeightMap.get(key).get(neighbourKey)));
       }
 
       cur.neighbours = neighboursNodes;
