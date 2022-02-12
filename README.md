@@ -12,17 +12,18 @@ Java HotSpot(TM) 64-Bit Server VM (build 16.0.2+7-67, mixed mode, sharing) <br>
 
 2. An external dependency for json-simple is used for quality of life purposes. If the jar is missing from the project root, download it by running the command below in the project root directory.
 ```
-  curl https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/json-simple/json-simple-1.1.1.jar --output json-simple-1.1.1.jar
+$ curl https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/json-simple/json-simple-1.1.1.jar \
+  --output json-simple-1.1.1.jar
 ```
 
 ## Running the code
 Each task is ran separately in its own command, differing only in the folder name specified.
 
 ## Using makefile
-task argument value must be one of TaskOne, TaskTwo or TaskThree. <br>
+"task" argument value must be one of TaskOne, TaskTwo or TaskThree. <br>
 Example for task one.
 ```
-  make run task=TaskOne
+$ make run task=TaskOne
 ```
 
 ## Alternatively, compiling and running manually
