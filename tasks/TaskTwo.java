@@ -1,8 +1,10 @@
 package tasks;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -51,10 +53,9 @@ public class TaskTwo {
     Node rootNode = new Node("1");
     pq.offer(rootNode);
 
-    Map<String, EdgeCosts> visited = new HashMap<>();
-    visited.put(rootNode.id, new EdgeCosts(0d, 0d));
-
-    // Set<String> set = new HashSet<>();
+    Map<String, List<EdgeCosts>> visited = new HashMap<>();
+    visited.put(rootNode.id, new ArrayList<>());
+    visited.get(rootNode.id).add(new EdgeCosts(0d, 0d));
 
     while (!pq.isEmpty()) {
       Node cur = pq.poll();
@@ -68,22 +69,17 @@ public class TaskTwo {
         double newDistCost = cur.distCost + distWeightMap.get(cur.id).get(neighbourId);
         double newEnergyCost = cur.energyCost + energyWeightMap.get(cur.id).get(neighbourId);
         EdgeCosts newEdgeCost = new EdgeCosts(newDistCost, newEnergyCost);
-        if (newEnergyCost <= energyBudget && newEdgeCost.oneIsLessThan(
-            visited.getOrDefault(neighbourId, new EdgeCosts(Double.MAX_VALUE, Double.MAX_VALUE)))) {
+        if (newEnergyCost <= energyBudget
+            && Util.hasPotential(newEdgeCost, visited.getOrDefault(neighbourId, new ArrayList<>()))) {
           // if (newEnergyCost <= energyBudget && ?????) {
+          visited.putIfAbsent(neighbourId, new ArrayList<>());
+          // this is optimal to allow "inbetweeners".
+          // consider (distance, energy): (10, 2), (2, 10), (5, 5), (12, 5) all 4 should
+          // be allowed, but (12, 12), (7, 7) are not as they are inferior to all other
+          // combinations
+          visited.get(neighbourId).add(newEdgeCost);
 
-          if (visited.containsKey(neighbourId)) {
-            // track the maximums, this is optimal to allow "inbetweeners".
-            // consider (distance, energy): (10, 2), (2, 10), (5, 5), (12, 5) all 4 should
-            // be allowed, but (12, 12), (7, 7) are not as they are inferior to all other
-            // combinations
-            visited.get(neighbourId).distEdgeCost = Math.max(visited.get(neighbourId).distEdgeCost, newDistCost);
-            visited.get(neighbourId).energyEdgeCost = Math.max(visited.get(neighbourId).energyEdgeCost, newEnergyCost);
-          } else {
-            visited.put(neighbourId, newEdgeCost);
-          }
           Node nextNode = new Node(neighbourId);
-
           nextNode.distCost = newDistCost;
           nextNode.energyCost = newEnergyCost;
           pq.offer(nextNode);

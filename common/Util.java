@@ -114,4 +114,14 @@ public class Util {
 
     return sb.toString();
   }
+
+  public static boolean hasPotential(EdgeCosts edgeCosts, List<EdgeCosts> exploredEdgeCosts) {
+    for (EdgeCosts e : exploredEdgeCosts) {
+      if (!edgeCosts.oneIsLessThan(e)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
