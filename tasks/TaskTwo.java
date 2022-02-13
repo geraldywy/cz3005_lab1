@@ -73,8 +73,12 @@ public class TaskTwo {
           // if (newEnergyCost <= energyBudget && ?????) {
 
           if (visited.containsKey(neighbourId)) {
-            visited.get(neighbourId).distEdgeCost = Math.min(visited.get(neighbourId).distEdgeCost, newDistCost);
-            visited.get(neighbourId).energyEdgeCost = Math.min(visited.get(neighbourId).energyEdgeCost, newEnergyCost);
+            // track the maximums, this is optimal to allow "inbetweeners".
+            // consider (distance, energy): (10, 2), (2, 10), (5, 5), (12, 5) all 4 should
+            // be allowed, but (12, 12), (7, 7) are not as they are inferior to all other
+            // combinations
+            visited.get(neighbourId).distEdgeCost = Math.max(visited.get(neighbourId).distEdgeCost, newDistCost);
+            visited.get(neighbourId).energyEdgeCost = Math.max(visited.get(neighbourId).energyEdgeCost, newEnergyCost);
           } else {
             visited.put(neighbourId, newEdgeCost);
           }
