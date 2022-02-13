@@ -8,7 +8,7 @@ import java.util.PriorityQueue;
 import common.Util;
 import common.Node;
 
-public class TaskOne {
+public class TaskTwoWrong {
 
   private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -17,9 +17,10 @@ public class TaskOne {
 
     final String root = "1";
     final String goal = "50";
+    final double energyBudget = 287932;
 
     long startTime = System.nanoTime();
-    Node goalNode = distUCS(graph, root, goal);
+    Node goalNode = distUCS(graph, root, goal, energyBudget);
     long endTime = System.nanoTime();
     long duration = (endTime - startTime) / 1000000;
 
@@ -30,7 +31,7 @@ public class TaskOne {
 
     String path = Util.buildPath(goalNode);
     System.out.println("Shortest Path from node 1 to 50");
-    System.out.println("============ Task One =============");
+    System.out.println("============ Task Two Wrong =============");
     System.out.println("Algorithm Runtime: " + duration + " ms");
     System.out.println("Total Distance Cost: " + df.format(goalNode.distCost));
     System.out.println("Total Energy Cost: " + df.format(goalNode.energyCost));
@@ -39,7 +40,7 @@ public class TaskOne {
 
   // distUCS performs a simple uniform cost search from root node to goal node and
   // returns the goal node if a path is found to it, otherwise returns null
-  private static Node distUCS(Map<String, Node> graph, String root, String goal) {
+  private static Node distUCS(Map<String, Node> graph, String root, String goal, double energyBudget) {
     PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> (int) ((a.distCost - b.distCost) % Integer.MAX_VALUE));
     Node rootNode = graph.get(root);
     pq.offer(rootNode);
@@ -61,7 +62,7 @@ public class TaskOne {
       for (Node n : cur.neighbours.keySet()) {
         Double newDistCost = cur.distCost + cur.neighbours.get(n).distEdgeCost;
         Double newEnergyCost = cur.energyCost + cur.neighbours.get(n).energyEdgeCost;
-        if (newDistCost < visited.getOrDefault(n.id, Double.MAX_VALUE)) {
+        if (newEnergyCost <= energyBudget && newDistCost < visited.getOrDefault(n.id, Double.MAX_VALUE)) {
           visited.put(n.id, newDistCost);
           n.distCost = newDistCost;
           n.energyCost = newEnergyCost;

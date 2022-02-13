@@ -23,7 +23,7 @@ public class TaskOneOptimised {
     final String goal = "50";
 
     long startTime = System.nanoTime();
-    Node meetingPoint = bidirectionalUCS(graph, root, goal);
+    Node meetingPoint = bidirectionalDistUCS(graph, root, goal);
     long endTime = System.nanoTime();
     long duration = (endTime - startTime) / 1000000;
 
@@ -41,10 +41,10 @@ public class TaskOneOptimised {
     System.out.println("Shortest Path: \n" + path);
   }
 
-  // bidirectionalUCS performs bidirectional UCS from source and goal node
+  // bidirectionalDistUCS performs bidirectional UCS from source and goal node
   // simulatenously. Returns the meeting point of both search if a path exists,
   // otherwise returns null
-  private static Node bidirectionalUCS(Map<String, Node> graph, String root, String goal) {
+  private static Node bidirectionalDistUCS(Map<String, Node> graph, String root, String goal) {
     PriorityQueue<Node> pq = new PriorityQueue<>(
         (a, b) -> (int) ((Math.min(a.distFromRoot, a.distFromGoal) - Math.min(b.distFromRoot, b.distFromGoal))
             % Integer.MAX_VALUE));
@@ -62,10 +62,10 @@ public class TaskOneOptimised {
     pq.offer(goalNode);
 
     Map<String, Double> visitedFromRoot = new HashMap<>();
-    visitedFromRoot.put(rootNode.id, (double) 0);
+    visitedFromRoot.put(rootNode.id, 0d);
 
     Map<String, Double> visitedFromGoal = new HashMap<>();
-    visitedFromGoal.put(goalNode.id, (double) 0);
+    visitedFromGoal.put(goalNode.id, 0d);
 
     while (!pq.isEmpty()) {
       Node cur = pq.poll();
@@ -73,11 +73,11 @@ public class TaskOneOptimised {
         return cur;
       }
       Map<String, Double> visited = cur.pathFromRoot ? visitedFromRoot : visitedFromGoal;
-      if (visited.get(cur.id) == -1) { // ensure every node is only expanded once
+      if (visited.get(cur.id) == -1d) { // ensure every node is only expanded once
         continue;
       }
-      visited.put(cur.id, (double) -1); // prevent edge case of 2 path with equal cost reaching same node, expanding the
-                                        // same node twice
+      visited.put(cur.id, -1d); // prevent edge case of 2 path with equal cost reaching same node, expanding the
+                                // same node twice
 
       for (Node n : cur.neighbours.keySet()) {
         // to handle edge case of a -> b having a different cost of b -> a, which is

@@ -60,7 +60,7 @@ public class Util {
     return new JSONObject();
   }
 
-  private static Map<String, Map<String, Double>> buildWeightMap(String filepath) {
+  public static Map<String, Map<String, Double>> buildWeightMap(String filepath) {
     JSONObject weightJson = readJsonFile(filepath);
 
     Map<String, Map<String, Double>> weightMap = new HashMap<>();
