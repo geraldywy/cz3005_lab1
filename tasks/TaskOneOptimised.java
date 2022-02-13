@@ -14,14 +14,37 @@ public class TaskOneOptimised {
    * observe improvement to runtime performance.
    */
 
-  private static final String root = "1";
-  private static final String goal = "50";
-
   private static final DecimalFormat df = new DecimalFormat("0.00");
 
   public static void main(String[] args) {
     Map<String, Node> graph = Util.buildGraph();
 
+    final String root = "1";
+    final String goal = "50";
+
+    long startTime = System.nanoTime();
+    Node meetingPoint = bidirectionalUCS(graph, root, goal);
+    long endTime = System.nanoTime();
+    long duration = (endTime - startTime) / 1000000;
+
+    if (meetingPoint == null) {
+      System.out.println("Path is not found!");
+      return;
+    }
+
+    String path = Util.buildPathFromMeetingPoint(meetingPoint);
+    System.out.println("Shortest Path from node 1 to 50");
+    System.out.println("====== Task One Optimised Bidirectional UCS ======");
+    System.out.println("Algorithm Runtime: " + duration + " ms");
+    System.out.println("Total Distance Cost: " + df.format(meetingPoint.distFromRoot + meetingPoint.distFromGoal));
+    System.out.println("Total Energy Cost: " + df.format(meetingPoint.energyFromRoot + meetingPoint.energyFromGoal));
+    System.out.println("Shortest Path: \n" + path);
+  }
+
+  // bidirectionalUCS performs bidirectional UCS from source and goal node
+  // simulatenously. Returns the meeting point of both search if a path exists,
+  // otherwise returns null
+  private static Node bidirectionalUCS(Map<String, Node> graph, String root, String goal) {
     PriorityQueue<Node> pq = new PriorityQueue<>(
         (a, b) -> (int) ((Math.min(a.distFromRoot, a.distFromGoal) - Math.min(b.distFromRoot, b.distFromGoal))
             % Integer.MAX_VALUE));
@@ -44,12 +67,10 @@ public class TaskOneOptimised {
     Map<String, Double> visitedFromGoal = new HashMap<>();
     visitedFromGoal.put(goalNode.id, (double) 0);
 
-    Node meetingPoint = null;
     while (!pq.isEmpty()) {
       Node cur = pq.poll();
       if (cur.pathFromRoot && cur.pathFromGoal) { // found optimal path connecting root and goal
-        meetingPoint = cur;
-        break;
+        return cur;
       }
       Map<String, Double> visited = cur.pathFromRoot ? visitedFromRoot : visitedFromGoal;
       if (visited.get(cur.id) == -1) { // ensure every node is only expanded once
@@ -85,11 +106,6 @@ public class TaskOneOptimised {
       }
     }
 
-    String path = Util.buildPathFromMeetingPoint(meetingPoint);
-    System.out.println("Shortest Path from node 1 to 50");
-    System.out.println("====== Task One Optimised Bidirectional UCS ======");
-    System.out.println("Total Distance Cost: " + df.format(meetingPoint.distFromRoot + meetingPoint.distFromGoal));
-    System.out.println("Total Energy Cost: " + df.format(meetingPoint.energyFromRoot + meetingPoint.energyFromGoal));
-    System.out.println("Shortest Path: \n" + path);
+    return null;
   }
 }

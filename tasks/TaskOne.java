@@ -10,14 +10,36 @@ import common.Node;
 
 public class TaskOne {
 
-  private static final String root = "1";
-  private static final String goal = "50";
-
   private static final DecimalFormat df = new DecimalFormat("0.00");
 
   public static void main(String[] args) {
     Map<String, Node> graph = Util.buildGraph();
 
+    final String root = "1";
+    final String goal = "50";
+
+    long startTime = System.nanoTime();
+    Node goalNode = ucs(graph, root, goal);
+    long endTime = System.nanoTime();
+    long duration = (endTime - startTime) / 1000000;
+
+    if (goalNode == null) {
+      System.out.println("Path is not found!");
+      return;
+    }
+
+    String path = Util.buildPath(goalNode);
+    System.out.println("Shortest Path from node 1 to 50");
+    System.out.println("============ Task One =============");
+    System.out.println("Algorithm Runtime: " + duration + " ms");
+    System.out.println("Total Distance Cost: " + df.format(goalNode.distCost));
+    System.out.println("Total Energy Cost: " + df.format(goalNode.energyCost));
+    System.out.println("Shortest Path: \n" + path);
+  }
+
+  // UCS performs a simple uniform cost search from root node to goal node and
+  // returns the goal node if a path is found to it, otherwise returns null
+  private static Node ucs(Map<String, Node> graph, String root, String goal) {
     PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> (int) ((a.distCost - b.distCost) % Integer.MAX_VALUE));
     Node rootNode = graph.get(root);
     pq.offer(rootNode);
@@ -50,15 +72,9 @@ public class TaskOne {
     }
 
     if (!visited.containsKey(goal)) {
-      System.out.println("path to goal is not found!");
-      return;
+      return null;
     }
 
-    String path = Util.buildPath(graph.get(goal));
-    System.out.println("Shortest Path from node 1 to 50");
-    System.out.println("============ Task One =============");
-    System.out.println("Total Distance Cost: " + df.format(graph.get(goal).distCost));
-    System.out.println("Total Energy Cost: " + df.format(graph.get(goal).energyCost));
-    System.out.println("Shortest Path: \n" + path);
+    return graph.get(goal);
   }
 }
