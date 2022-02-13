@@ -18,7 +18,7 @@ public class TaskOne {
   public static void main(String[] args) {
     Map<String, Node> graph = Util.buildGraph();
 
-    PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> (int) (a.distCost - b.distCost));
+    PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> (int) ((a.distCost - b.distCost) % Integer.MAX_VALUE));
     Node rootNode = graph.get(root);
     pq.offer(rootNode);
 

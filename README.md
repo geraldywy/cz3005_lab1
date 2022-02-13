@@ -20,7 +20,7 @@ $ curl https://storage.googleapis.com/google-code-archive-downloads/v2/code.goog
 Each task is ran separately in its own command, differing only in the folder name specified.
 
 ## Using makefile
-"task" argument value must be one of TaskOne, TaskTwo or TaskThree. <br>
+"task" argument value must be one of TaskOne, TaskOneOptimised, TaskTwo or TaskThree. <br>
 Example for task one.
 ```
 $ make run task=TaskOne
@@ -37,6 +37,11 @@ $ javac -cp "json-simple-1.1.1.jar" common/*.java
 To run Task One:
 ```
 $ java -cp ".:json-simple-1.1.1.jar" tasks/TaskOne.java
+```
+
+To run Task One optimised version (Bidirectional UCS):
+```
+$ java -cp ".:json-simple-1.1.1.jar" tasks/TaskOneOptimised.java
 ```
 
 To run Task Two:

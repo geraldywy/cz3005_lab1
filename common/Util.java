@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONArray;
@@ -84,9 +85,31 @@ public class Util {
       temp = temp.parent;
     }
 
+    return stringifyPath(res);
+  }
+
+  // Reconstruct path from meeting point of a bidrectional search.
+  public static String buildPathFromMeetingPoint(Node meetingPoint) {
+    LinkedList<String> res = new LinkedList<>();
+    Node temp = meetingPoint;
+    while (temp != null) {
+      res.addFirst(temp.id);
+      temp = temp.parentFromRoot;
+    }
+
+    temp = meetingPoint.nextToGoal; // careful of duplicating meeting point in output path
+    while (temp != null) {
+      res.addLast(temp.id);
+      temp = temp.nextToGoal;
+    }
+
+    return stringifyPath(res);
+  }
+
+  private static String stringifyPath(List<String> path) {
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < res.size(); i++) {
-      sb.append(res.get(i) + (i == res.size() - 1 ? "" : " -> "));
+    for (int i = 0; i < path.size(); i++) {
+      sb.append(path.get(i) + (i == path.size() - 1 ? "" : " -> "));
     }
 
     return sb.toString();
