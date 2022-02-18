@@ -88,6 +88,25 @@ public class Util {
     return stringifyPath(res);
   }
 
+  public static Map<String, Coord> buildCoordinateMap(String filepath) {
+    JSONObject coordJson = readJsonFile(filepath);
+
+    Map<String, Coord> coordMap = new HashMap<>();
+    for (Object keyObj : coordJson.keySet()) {
+      String key = keyObj.toString();
+      String value = coordJson.get(keyObj).toString().trim();
+      String[] splits = value.substring(1, value.length() - 1).split(","); // strip '[' and ']'
+      Coord coord = new Coord(Double.valueOf(splits[0]), Double.valueOf(splits[1]));
+      if (coordMap.containsKey(key)) {
+        System.out.println("the key: " + key + " is duplicated");
+        System.exit(1);
+      }
+      coordMap.put(key, coord);
+    }
+
+    return coordMap;
+  }
+
   // Reconstruct path from meeting point of a bidrectional search.
   public static String buildPathFromMeetingPoint(Node meetingPoint) {
     LinkedList<String> res = new LinkedList<>();
@@ -123,5 +142,10 @@ public class Util {
     }
 
     return true;
+  }
+
+  // f(x) = g(x) + h(x)
+  public static double f(Node node, Map<String, Coord> coordMap, Coord goalCoord) {
+    return node.distCost + coordMap.get(node.id).calcEuclideanDistTo(goalCoord);
   }
 }

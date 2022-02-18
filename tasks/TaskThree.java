@@ -10,23 +10,25 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import common.Util;
+import common.Coord;
 import common.EdgeCosts;
 import common.Node;
 
-public class TaskTwo {
+public class TaskThree {
 
   private static final DecimalFormat df = new DecimalFormat("0.00");
 
   public static void main(String[] args) {
     Map<String, Map<String, Double>> distWeightMap = Util.buildWeightMap("Dist.json");
     Map<String, Map<String, Double>> energyWeightMap = Util.buildWeightMap("Cost.json");
+    Map<String, Coord> coordinatesMap = Util.buildCoordinateMap("Coord.json");
 
     final String root = "1";
     final String goal = "50";
     final double energyBudget = 287932;
 
     long startTime = System.nanoTime();
-    Node goalNode = ucs(distWeightMap, energyWeightMap, root, goal, energyBudget);
+    Node goalNode = aStart(distWeightMap, energyWeightMap, coordinatesMap, root, goal, energyBudget);
     long endTime = System.nanoTime();
     long duration = (endTime - startTime) / 1000000;
 
@@ -36,20 +38,29 @@ public class TaskTwo {
     }
 
     String path = Util.buildPath(goalNode);
-    System.out.println("Shortest Path from node 1 to 50 with energy budget constraint");
-    System.out.println("============ Task Two =============");
+    System.out
+        .println("Shortest Path from node 1 to 50 with energy budget constraint, using eucledian distance heuristic");
+    System.out.println("============ Task Three =============");
     System.out.println("Algorithm Runtime: " + duration + " ms");
     System.out.println("Total Distance Cost: " + df.format(goalNode.distCost));
     System.out.println("Total Energy Cost: " + df.format(goalNode.energyCost));
     System.out.println("Shortest Path: \n" + path);
   }
 
-  // ucs performs a simple uniform cost search from root node to goal node with an
-  // energy budget constraint and returns the goal node if a path is found to it,
-  // otherwise returns null
-  private static Node ucs(Map<String, Map<String, Double>> distWeightMap,
-      Map<String, Map<String, Double>> energyWeightMap, String root, String goal, double energyBudget) {
-    PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> (int) ((a.distCost - b.distCost) % Integer.MAX_VALUE));
+  // aStar performs an A* search from root node to goal node with an
+  // energy budget constraint. The heuristic function used is the euclidean
+  // distance from node to the goal node and returns the goal node if a path is
+  // found to it, otherwise returns null
+  private static Node aStart(Map<String, Map<String, Double>> distWeightMap,
+      Map<String, Map<String, Double>> energyWeightMap,
+      Map<String, Coord> coordMap,
+      String root, String goal, double energyBudget) {
+
+    Coord goalNodeCoord = coordMap.get(goal);
+    // order in ascending f(x) = g(x) + h(x)
+    PriorityQueue<Node> pq = new PriorityQueue<>(
+        (a, b) -> (int) ((Util.f(a, coordMap, goalNodeCoord) - Util.f(b, coordMap, goalNodeCoord))
+            % Integer.MAX_VALUE));
     Node rootNode = new Node("1");
     pq.offer(rootNode);
 
