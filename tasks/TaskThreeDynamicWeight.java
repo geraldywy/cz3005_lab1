@@ -2,6 +2,7 @@ package tasks;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,7 @@ import common.Coord;
 import common.EdgeCosts;
 import common.Node;
 
-public class TaskThreeStaticWeight {
+public class TaskThreeDynamicWeight {
 
   private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -39,7 +40,7 @@ public class TaskThreeStaticWeight {
 
     String path = Util.buildPath(goalNode);
     System.out.println(
-        "Shortest Path from node 1 to 50 with energy budget constraint, using static weight eucledian distance heuristic");
+        "Shortest Path from node 1 to 50 with energy budget constraint, using dynamic weight eucledian distance heuristic");
     System.out.println("============ Task Three Optimised =============");
     System.out.println("Algorithm Runtime: " + duration + " ms");
     System.out.println("Total Distance Cost: " + df.format(goalNode.distCost));
@@ -59,8 +60,8 @@ public class TaskThreeStaticWeight {
     Coord goalNodeCoord = coordMap.get(goal);
     // order in ascending f(x) = g(x) + w(x) * h(x)
     PriorityQueue<Node> pq = new PriorityQueue<>(
-        (a, b) -> (int) ((Util.f(a.distCost, coordMap.get(a.id), goalNodeCoord, weight)
-            - Util.f(b.distCost, coordMap.get(b.id), goalNodeCoord, weight))
+        (a, b) -> (int) ((dynamicWeightCostFunc(a.distCost, coordMap.get(a.id), goalNodeCoord, weight)
+            - dynamicWeightCostFunc(b.distCost, coordMap.get(b.id), goalNodeCoord, weight))
             % Integer.MAX_VALUE));
     Node rootNode = new Node(root);
     pq.offer(rootNode);
@@ -100,5 +101,11 @@ public class TaskThreeStaticWeight {
     }
 
     return null;
+  }
+
+  private static double dynamicWeightCostFunc(double nodeDistCost, Coord nodeCoord, Coord goalCoord, double weight) {
+    double eucledianDist = nodeCoord.calcEuclideanDistTo(goalCoord);
+    return nodeDistCost < eucledianDist ? nodeDistCost + eucledianDist
+        : (nodeDistCost + (2 * weight - 1) * eucledianDist) / weight;
   }
 }
