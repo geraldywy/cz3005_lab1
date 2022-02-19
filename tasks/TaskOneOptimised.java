@@ -46,8 +46,7 @@ public class TaskOneOptimised {
   // otherwise returns null
   private static Node bidirectionalDistUCS(Map<String, Node> graph, String root, String goal) {
     PriorityQueue<Node> pq = new PriorityQueue<>(
-        (a, b) -> (int) ((Math.min(a.distFromRoot, a.distFromGoal) - Math.min(b.distFromRoot, b.distFromGoal))
-            % Integer.MAX_VALUE));
+        (a, b) -> (int) ((a.getBidirDistCost() - b.getBidirDistCost()) % Integer.MAX_VALUE));
     Node rootNode = graph.get(root);
     Node goalNode = graph.get(goal);
     rootNode.distFromRoot = 0;
@@ -93,15 +92,19 @@ public class TaskOneOptimised {
             n.distFromRoot = newDistCost;
             n.energyFromRoot = newEnergyCost;
             n.parentFromRoot = cur; // keep track of parent node to rebuild path from goal node to source node
+
+            n.pathFromRoot = true;
           } else {
             n.distFromGoal = newDistCost;
             n.energyFromGoal = newEnergyCost;
             n.nextToGoal = cur;
+
+            n.pathFromGoal = true;
           }
           pq.offer(n);
 
-          n.pathFromRoot = n.pathFromRoot || cur.pathFromRoot;
-          n.pathFromGoal = n.pathFromGoal || cur.pathFromGoal;
+          // n.pathFromRoot = n.pathFromRoot || cur.pathFromRoot;
+          // n.pathFromGoal = n.pathFromGoal || cur.pathFromGoal;
         }
       }
     }

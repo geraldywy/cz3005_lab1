@@ -145,7 +145,7 @@ public class Util {
   }
 
   // f(x) = g(x) + h(x)
-  public static double f(Node node, Map<String, Coord> coordMap, Coord goalCoord) {
-    return node.distCost + coordMap.get(node.id).calcEuclideanDistTo(goalCoord);
+  public static double f(double nodeDistCost, Coord nodeCoord, Coord goalCoord) {
+    return nodeDistCost + nodeCoord.calcEuclideanDistTo(goalCoord);
   }
 }

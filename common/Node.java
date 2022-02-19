@@ -22,6 +22,7 @@ public class Node {
   public double energyFromGoal;
   public Node parentFromRoot;
   public Node nextToGoal;
+  public Coord targetNodeCoord;
 
   public Node(String id) {
     this.id = id;
@@ -32,12 +33,22 @@ public class Node {
 
     this.pathFromRoot = false;
     this.pathFromGoal = false;
-    this.distFromRoot = Integer.MAX_VALUE;
-    this.distFromGoal = Integer.MAX_VALUE;
-    this.energyFromRoot = Integer.MAX_VALUE;
-    this.energyFromGoal = Integer.MAX_VALUE;
+    this.distFromRoot = Double.MAX_VALUE;
+    this.distFromGoal = Double.MAX_VALUE;
+    this.energyFromRoot = Double.MAX_VALUE;
+    this.energyFromGoal = Double.MAX_VALUE;
 
     this.parentFromRoot = null;
     this.nextToGoal = null;
+
+    this.targetNodeCoord = null;
+  }
+
+  // for bidirectional use only
+  public double getBidirDistCost() {
+    double rootDist = this.distFromRoot == Double.MAX_VALUE ? 0 : distFromRoot;
+    double goalDist = this.distFromGoal == Double.MAX_VALUE ? 0 : distFromGoal;
+
+    return rootDist + goalDist;
   }
 }

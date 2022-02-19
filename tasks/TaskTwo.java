@@ -3,11 +3,9 @@ package tasks;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 import common.Util;
 import common.EdgeCosts;
@@ -50,7 +48,7 @@ public class TaskTwo {
   private static Node ucs(Map<String, Map<String, Double>> distWeightMap,
       Map<String, Map<String, Double>> energyWeightMap, String root, String goal, double energyBudget) {
     PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> (int) ((a.distCost - b.distCost) % Integer.MAX_VALUE));
-    Node rootNode = new Node("1");
+    Node rootNode = new Node(root);
     pq.offer(rootNode);
 
     Map<String, List<EdgeCosts>> visited = new HashMap<>();
