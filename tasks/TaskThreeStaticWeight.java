@@ -2,6 +2,7 @@ package tasks;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,7 @@ import common.Coord;
 import common.EdgeCosts;
 import common.Node;
 
-public class TaskThree {
+public class TaskThreeStaticWeight {
 
   private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -24,9 +25,11 @@ public class TaskThree {
     final String root = "1";
     final String goal = "50";
     final double energyBudget = 287932;
+    final double weight = 1.2;
 
     long startTime = System.nanoTime();
-    Node goalNode = aStar(distWeightMap, energyWeightMap, coordinatesMap, root, goal, energyBudget);
+    Node goalNode = staticWeightAStar(distWeightMap, energyWeightMap,
+        coordinatesMap, root, goal, energyBudget, weight);
     long endTime = System.nanoTime();
     long duration = (endTime - startTime) / 1000000;
 
@@ -36,8 +39,8 @@ public class TaskThree {
     }
 
     String path = Util.buildPath(goalNode);
-    System.out
-        .println("Shortest Path from node 1 to 50 with energy budget constraint, using eucledian distance heuristic");
+    System.out.println(
+        "Shortest Path from node 1 to 50 with energy budget constraint, using static weight eucledian distance heuristic");
     System.out.println("============ Task Three =============");
     System.out.println("Algorithm Runtime: " + duration + " ms");
     System.out.println("Total Distance Cost: " + df.format(goalNode.distCost));
@@ -45,20 +48,20 @@ public class TaskThree {
     System.out.println("Shortest Path: \n" + path);
   }
 
-  // aStar performs an A* search from root node to goal node with an
-  // energy budget constraint. The heuristic function used is the euclidean
-  // distance from node to the goal node and returns the goal node if a path is
-  // found to it, otherwise returns null
-  private static Node aStar(Map<String, Map<String, Double>> distWeightMap,
+  // staticWeightAStar performs a weighted A* search from root node to goal node
+  // with an energy budget constraint. The heuristic function used is the
+  // euclidean distance from node to the goal node and returns the goal node if a
+  // path is found to it, otherwise returns null
+  private static Node staticWeightAStar(Map<String, Map<String, Double>> distWeightMap,
       Map<String, Map<String, Double>> energyWeightMap,
       Map<String, Coord> coordMap,
-      String root, String goal, double energyBudget) {
+      String root, String goal, double energyBudget, double weight) {
 
     Coord goalNodeCoord = coordMap.get(goal);
-    // order in ascending f(x) = g(x) + h(x)
+    // order in ascending f(x) = g(x) + w(x) * h(x)
     PriorityQueue<Node> pq = new PriorityQueue<>(
-        (a, b) -> (int) ((Util.f(a.distCost, coordMap.get(a.id), goalNodeCoord, 1)
-            - Util.f(b.distCost, coordMap.get(b.id), goalNodeCoord, 1))
+        (a, b) -> (int) ((Util.f(a.distCost, coordMap.get(a.id), goalNodeCoord, weight)
+            - Util.f(b.distCost, coordMap.get(b.id), goalNodeCoord, weight))
             % Integer.MAX_VALUE));
     Node rootNode = new Node(root);
     pq.offer(rootNode);

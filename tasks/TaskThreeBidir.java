@@ -12,7 +12,7 @@ import common.Coord;
 import common.EdgeCosts;
 import common.Node;
 
-public class TaskThreeOptimised {
+public class TaskThreeBidir {
 
   private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -60,8 +60,8 @@ public class TaskThreeOptimised {
 
     // order in ascending f(x) = g(x) + h(x)
     PriorityQueue<Node> pq = new PriorityQueue<>(
-        (a, b) -> (int) ((Util.f(a.getBidirDistCost(), coordMap.get(a.id), a.targetNodeCoord)
-            - Util.f(b.getBidirDistCost(), coordMap.get(b.id), b.targetNodeCoord))
+        (a, b) -> (int) ((Util.f(a.getBidirDistCost(), coordMap.get(a.id), a.targetNodeCoord, 1)
+            - Util.f(b.getBidirDistCost(), coordMap.get(b.id), b.targetNodeCoord, 1))
             % Integer.MAX_VALUE));
 
     Node rootNode = new Node(root);
@@ -76,7 +76,7 @@ public class TaskThreeOptimised {
     goalNode.energyFromGoal = 0;
     goalNode.pathFromGoal = true;
     goalNode.targetNodeCoord = rootNodeCoord;
-    // pq.offer(goalNode);
+    pq.offer(goalNode);
 
     Map<String, List<EdgeCosts>> visitedFromRoot = new HashMap<>();
     visitedFromRoot.put(rootNode.id, new ArrayList<>());
@@ -90,20 +90,13 @@ public class TaskThreeOptimised {
     goalEC.node = goalNode;
     visitedFromGoal.get(goalNode.id).add(goalEC);
 
-    Node meetingPoint = null;
     while (!pq.isEmpty()) {
       Node cur = pq.poll();
-      // System.out.println("cur id: " + cur.id + " dist cost: " + cur.distFromRoot +
-      // " energy cost: " + cur.energyFromRoot
-      // + " has path to root: " + cur.pathFromRoot);
 
       // * we allow more than 1 visits to the same node, because they might have
       // different energy costs
-
       if (cur.pathFromRoot && cur.pathFromGoal) {
-        if (meetingPoint == null || cur.getBidirDistCost() < meetingPoint.getBidirDistCost()) {
-          meetingPoint = cur;
-        }
+        return cur;
       }
 
       for (String neighbourId : distWeightMap.get(cur.id).keySet()) {
@@ -126,7 +119,6 @@ public class TaskThreeOptimised {
             && Util.hasPotential(newEdgeCost, visited.get(neighbourId))) {
 
           Node nextNode = new Node(neighbourId);
-          // System.out.println("here: " + newDistCost + " " + newEnergyCost);
           nextNode.targetNodeCoord = cur.targetNodeCoord;
 
           if (cur.pathFromGoal) { // keep track of node links to rebuild path from goal node to source node
@@ -144,14 +136,15 @@ public class TaskThreeOptimised {
 
           // additional step to look for meeting point if exists
           // consider, the best possible option if multiple possible routes exist
-
-          // boolean possible = false;
+          // this is optimal to allow "inbetweeners".
+          // consider (distance, energy): (10, 2), (2, 10), (5, 5), (12, 5) all 4 should
+          // be allowed, but (12, 12), (7, 7) are not as they are inferior to all other
+          // combinations
           Map<String, List<EdgeCosts>> visitedFromOtherEnd = cur.pathFromRoot ? visitedFromGoal : visitedFromRoot;
           visitedFromOtherEnd.putIfAbsent(nextNode.id, new ArrayList<>());
           for (EdgeCosts e : visitedFromOtherEnd.get(nextNode.id)) {
             if ((cur.pathFromRoot && nextNode.energyFromRoot + e.node.energyFromGoal <= energyBudget)
                 || (cur.pathFromGoal && nextNode.energyFromGoal + e.node.energyFromRoot <= energyBudget)) {
-              // possible = true;
               if (cur.pathFromRoot) {
                 nextNode.distFromGoal = Math.min(nextNode.distFromGoal, e.node.distFromGoal);
                 nextNode.energyFromGoal = Math.min(nextNode.energyFromGoal, e.node.energyFromGoal);
@@ -163,26 +156,17 @@ public class TaskThreeOptimised {
                 nextNode.parentFromRoot = e.node.parentFromRoot;
                 nextNode.pathFromRoot = true;
               }
+
+              nextNode.targetNodeCoord = null; // remove target node once a path it is a meeting point
             }
           }
-          // if (possible) {
-          // return nextNode;
-          // }
 
-          // this is optimal to allow "inbetweeners".
-          // consider (distance, energy): (10, 2), (2, 10), (5, 5), (12, 5) all 4 should
-          // be allowed, but (12, 12), (7, 7) are not as they are inferior to all other
-          // combinations
           visited.get(neighbourId).add(newEdgeCost);
-
-          // System.out.println("can visit next: " + nextNode.id + " next node costs: " +
-          // nextNode.distFromRoot + " "
-          // + nextNode.energyFromRoot);
           pq.offer(nextNode);
         }
       }
     }
 
-    return meetingPoint;
+    return null;
   }
 }
